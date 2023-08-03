@@ -3,16 +3,30 @@
 namespace App\Database;
 
 use App\Database\Connection;
+use App\Models\Category;
 use App\Models\Product;
 
 class ProductDAO extends Connection
 {
-  public static function all()
+  public static function all($withCategory = false)
   {
-    $products = self::query('SELECT * FROM products');
+    $sql = $withCategory
+      ? 'SELECT products.id id, products.name name, price, description, category_id, categories.name category_name FROM products JOIN categories ON products.category_id = categories.id'
+      : 'SELECT * FROM products';
+    $products = self::query($sql);
 
-    return array_map(function ($product) {
-      return new Product($product['id'], $product['name'], $product['price'], $product['description']);
+    return array_map(function ($product) use ($withCategory) {
+      return new Product(
+        $product['id'],
+        $product['name'],
+        $product['price'],
+        $product['description'],
+        $product['category_id'],
+        $withCategory ? new Category(
+          $product['category_id'],
+          $product['category_name']
+        ) : null
+      );
     }, $products);
   }
 
@@ -24,7 +38,14 @@ class ProductDAO extends Connection
 
     if (count($products) > 0) {
       $product = $products[0];
-      return new Product($product['id'], $product['name'], $product['price'], $product['description']);
+      return new Product(
+        $product['id'],
+        $product['name'],
+        $product['price'],
+        $product['description'],
+        $product['category_id'],
+        null
+      );
     }
 
     return null;
@@ -32,16 +53,16 @@ class ProductDAO extends Connection
 
   public static function create(Product $product)
   {
-    $sql = 'INSERT INTO products (name, price, description) VALUES (?, ?, ?)';
-    $params = [$product->getName(), $product->getPrice(), $product->getDescription()];
+    $sql = 'INSERT INTO products (name, price, description, category_id) VALUES (?, ?, ?, ?)';
+    $params = [$product->getName(), $product->getPrice(), $product->getDescription(), $product->getCategoryId()];
 
     return self::query($sql, $params);
   }
 
   public static function update(Product $product)
   {
-    $sql = 'UPDATE products SET name = ?, price = ?, description = ? WHERE id = ?';
-    $params = [$product->getName(), $product->getPrice(), $product->getDescription(), $product->getId()];
+    $sql = 'UPDATE products SET name = ?, price = ?, description = ?, category_id = ? WHERE id = ?';
+    $params = [$product->getName(), $product->getPrice(), $product->getDescription(), $product->getCategoryId(), $product->getId()];
 
     return self::query($sql, $params);
   }

@@ -7,7 +7,7 @@ use PDOException;
 
 class Connection
 {
-  public static function connect($hostname = 'localhost', $database = 'php-crud', $username = 'root', $password = '')
+  public static function connect($hostname = 'localhost', $database = 'php_crud', $username = 'root', $password = '')
   {
     try {
       $connection = new PDO("mysql:host=$hostname;dbname=$database", $username, $password);

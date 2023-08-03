@@ -4,7 +4,7 @@ require 'vendor/autoload.php';
 
 use App\Database\ProductDAO;
 
-$products = ProductDAO::all();
+$products = ProductDAO::all(true);
 
 include 'src/templates/header.php';
 
@@ -21,6 +21,7 @@ include 'src/templates/header.php';
             <th>Name</th>
             <th>Price</th>
             <th>Description</th>
+            <th>Category</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -31,6 +32,7 @@ include 'src/templates/header.php';
               <td><?= $product->getName() ?></td>
               <td><?= $product->getPrice() ?></td>
               <td><?= $product->getDescription() ?></td>
+              <td><?= $product->getCategory()->getName() ?></td>
               <td>
                 <div class="d-flex align-items-center">
                   <a href="edit.php?id=<?= $product->getId() ?>" class="btn btn-warning">Edit</a>
