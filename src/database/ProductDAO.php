@@ -13,6 +13,9 @@ class ProductDAO extends Connection
     $sql = $withCategory
       ? 'SELECT products.id id, products.name name, price, description, category_id, categories.name category_name FROM products JOIN categories ON products.category_id = categories.id'
       : 'SELECT * FROM products';
+
+    $sql .= ' ORDER BY id';
+
     $products = self::query($sql);
 
     return array_map(function ($product) use ($withCategory) {
