@@ -59,6 +59,29 @@ class ProductDAO extends Connection
     return self::query($sql, $params);
   }
 
+  public static function createMany(Product ...$products)
+  {
+    $sql = 'INSERT INTO products (name, price, description, category_id) VALUES ';
+
+    for ($i = 0; $i < count($products); $i++) {
+      $sql .= '(?, ?, ?),';
+    }
+
+    $sql = substr_replace($sql, ';', strlen($sql) - 1, 1);
+
+    self::query(
+      $sql,
+      array_merge(
+        ...array_map(
+          function ($product) {
+            return [$product->getName(), $product->getPrice(), $product->getDescription(), $product->getCategoryId()];
+          },
+          $products
+        )
+      )
+    );
+  }
+
   public static function update(Product $product)
   {
     $sql = 'UPDATE products SET name = ?, price = ?, description = ?, category_id = ? WHERE id = ?';
